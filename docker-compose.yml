@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+
+
+  guac_db:
+    hostname: db
+    build:
+      context: .
+    volumes:
+      - guac-db-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: P455w0rd
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: Pass12345
+
+  guacd:
+    image: guacamole/guacd:0.9.12-incubating
+    ports:
+      - 4822:4822
+
+  guacamole:
+    image: guacamole/guacamole:0.9.12-incubating
+    ports:
+      - 8081:8080
+    links:
+      - guacd
+      - guac_db
+    environment:
+      GUACD_HOSTNAME: guacd
+      MYSQL_HOSTNAME: guac_db
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: Pass12345
+
+volumes:
+  guac-db-volume:
